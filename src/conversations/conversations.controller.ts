@@ -1,4 +1,4 @@
-import { Body, Controller, HttpStatus, Post, Res } from '@nestjs/common';
+import { Body, Controller, HttpStatus, Post } from '@nestjs/common';
 import { CompletionRequestDto } from './dto/completion-request.dto';
 import { ConversationsService } from './conversations.service';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -14,7 +14,7 @@ export class ConversationsController {
     status: HttpStatus.OK,
     type: CompletionResponse,
   })
-  async generateCompletion(@Body() body: CompletionRequestDto) {
+  generateCompletion(@Body() body: CompletionRequestDto) {
     return this.conversationsService.generateCompletion(body);
   }
 }
