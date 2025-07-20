@@ -1,6 +1,6 @@
 import { Body, Controller, HttpStatus, Post } from '@nestjs/common';
-import { CompletionRequestDto } from './dto/completion-request.dto';
-import { ConversationsService } from './conversations.service';
+import { CompletionRequestDto } from '../dto/completion-request.dto';
+import { ConversationsService } from '../service/conversations.service';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CompletionResponse } from 'src/swagger/conversations.api.response';
 

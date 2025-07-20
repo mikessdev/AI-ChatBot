@@ -1,6 +1,9 @@
-import { InternalServerErrorException } from '@nestjs/common';
-import { ClaudSearchRequest } from './interface/claudSearchRequest-interface';
-import { ClaudSearchResponse } from './interface/claudSearchResponse-interface';
+import {
+  InternalServerErrorException,
+  ServiceUnavailableException,
+} from '@nestjs/common';
+import { ClaudSearchRequest } from '../interface/claudSearchRequest-interface';
+import { ClaudSearchResponse } from '../interface/claudSearchResponse-interface';
 
 export class CloudIARepository {
   private readonly URL: string;
@@ -28,9 +31,8 @@ export class CloudIARepository {
 
       return await response.json();
     } catch (error) {
-      throw new InternalServerErrorException(
-        `Claud vector api failed: ${error.message}`,
-      );
+      console.error(error);
+      throw new ServiceUnavailableException('Claud vector api failed:');
     }
   }
 }

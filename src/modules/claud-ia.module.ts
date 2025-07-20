@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { CloudIAService } from './claud-ia.service';
-import { CloudIARepository } from './claud-ia.repository';
+import { CloudIAService } from './service/claud-ia.service';
+import { CloudIARepository } from './repository/claud-ia.repository';
 
 @Module({
   controllers: [],

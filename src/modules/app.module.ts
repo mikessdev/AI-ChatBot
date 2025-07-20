@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { ConversationsModule } from './conversations/conversations.module';
-import { OpenaiApiModule } from './openai-api/openai-api.module';
 import { ConfigModule } from '@nestjs/config';
-import { ClaudIaModule } from './claud-ia/claud-ia.module';
+import { ConversationsModule } from './conversations.module';
+import { OpenaiApiModule } from './openai-api.module';
+import { ClaudIaModule } from './claud-ia.module';
+import { AppController } from './controller/app.controller';
+import { AppService } from './service/app.service';
 
 @Module({
   imports: [

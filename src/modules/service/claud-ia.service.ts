@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { CloudIARepository } from './claud-ia.repository';
-import { ClaudSearchRequest } from './interface/claudSearchRequest-interface';
-import { ClaudSearchResponse } from './interface/claudSearchResponse-interface';
+import { CloudIARepository } from '../repository/claud-ia.repository';
+import { ClaudSearchRequest } from '../interface/claudSearchRequest-interface';
+import { ClaudSearchResponse } from '../interface/claudSearchResponse-interface';
 
 @Injectable()
 export class CloudIAService {

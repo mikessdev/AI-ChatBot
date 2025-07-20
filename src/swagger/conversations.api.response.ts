@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { MessageDto } from 'src/conversations/dto/completion-request.dto';
-import { SectionRetrievedDto } from 'src/conversations/dto/completion-response.dto';
+import { MessageDto } from 'src/modules/dto/completion-request.dto';
+import { SectionRetrievedDto } from 'src/modules/dto/completion-response.dto';
 
 export class CompletionResponse {
   @ApiProperty({
