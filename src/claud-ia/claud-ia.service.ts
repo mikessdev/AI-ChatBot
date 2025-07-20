@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { CloudIARepository } from './claud-ia.repository';
-import { AzureSearchRequest } from './interface/azureSearchRequest-interface';
-import { AzureSearchResponse } from './interface/azureSearchResponse-interface';
+import { ClaudSearchRequest } from './interface/claudSearchRequest-interface';
+import { ClaudSearchResponse } from './interface/claudSearchResponse-interface';
 
 @Injectable()
 export class CloudIAService {
@@ -10,8 +10,8 @@ export class CloudIAService {
   async searchEmbeddingsByProjectName(
     projectName: string,
     embeddings: number[],
-  ): Promise<AzureSearchResponse> {
-    const queryEmbedding: AzureSearchRequest = this.buildEmbeddingQuery(
+  ): Promise<ClaudSearchResponse> {
+    const queryEmbedding: ClaudSearchRequest = this.buildEmbeddingQuery(
       projectName,
       embeddings,
     );
@@ -22,8 +22,8 @@ export class CloudIAService {
   private buildEmbeddingQuery(
     projectName: string,
     embeddings: number[],
-  ): AzureSearchRequest {
-    const azureSearchRequest: AzureSearchRequest = {
+  ): ClaudSearchRequest {
+    const azureSearchRequest: ClaudSearchRequest = {
       count: true,
       select: 'content, type',
       top: 10,

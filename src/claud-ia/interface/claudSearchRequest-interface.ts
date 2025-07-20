@@ -5,7 +5,7 @@ export interface VectorQuery {
   kind: string;
 }
 
-export interface AzureSearchRequest {
+export interface ClaudSearchRequest {
   count?: boolean;
   select?: string;
   top?: number;

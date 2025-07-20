@@ -1,6 +1,6 @@
 import { InternalServerErrorException } from '@nestjs/common';
-import { AzureSearchRequest } from './interface/azureSearchRequest-interface';
-import { AzureSearchResponse } from './interface/azureSearchResponse-interface';
+import { ClaudSearchRequest } from './interface/claudSearchRequest-interface';
+import { ClaudSearchResponse } from './interface/claudSearchResponse-interface';
 
 export class CloudIARepository {
   private readonly URL: string;
@@ -15,8 +15,8 @@ export class CloudIARepository {
   }
 
   async GetFromVectorApi(
-    azureSearchRequest: AzureSearchRequest,
-  ): Promise<AzureSearchResponse> {
+    azureSearchRequest: ClaudSearchRequest,
+  ): Promise<ClaudSearchResponse> {
     const url: string = `${this.URL}/search?api-version=2023-11-01`;
 
     try {

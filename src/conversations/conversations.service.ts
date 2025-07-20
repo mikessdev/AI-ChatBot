@@ -1,11 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { CompletionRequestDto } from './dto/completion-request.dto';
 import { OpenaiApiService } from 'src/openai-api/openai-api.service';
-import {
-  CreateEmbeddingResponse,
-  Embedding,
-} from 'openai/resources/embeddings';
+import { CreateEmbeddingResponse } from 'openai/resources/embeddings';
 import { CloudIAService } from 'src/claud-ia/claud-ia.service';
+import { ClaudSearchResponse } from 'src/claud-ia/interface/claudSearchResponse-interface';
 
 @Injectable()
 export class ConversationsService {
@@ -17,7 +15,7 @@ export class ConversationsService {
   async generateCompletion(completion: CompletionRequestDto) {
     const { projectName, messages } = completion;
     const generateEmbeddingsPromises: Promise<CreateEmbeddingResponse>[] = [];
-    const embeddingsAnswers: Promise<any>[] = [];
+    const embeddingsAnswers: Promise<ClaudSearchResponse>[] = [];
 
     messages.forEach(({ content }) => {
       generateEmbeddingsPromises.push(
@@ -33,7 +31,7 @@ export class ConversationsService {
       );
     });
 
-    const answers: any[] = await Promise.all(embeddingsAnswers);
+    const answers: ClaudSearchResponse[] = await Promise.all(embeddingsAnswers);
     return answers;
   }
 
