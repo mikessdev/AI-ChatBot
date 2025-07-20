@@ -26,7 +26,7 @@ export class OpenaiApiRepository {
   async generateEmbeddings(text: string): Promise<CreateEmbeddingResponse> {
     const body: EmbeddingCreateParams = {
       input: text,
-      model: 'text-embedding-3-small',
+      model: 'text-embedding-3-large',
     };
 
     return await this.openai.embeddings.create(body, this.options);
