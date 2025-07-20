@@ -1,7 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { OpenaiApiRepository } from '../repository/openai-api.repository';
 import { CreateEmbeddingResponse } from 'openai/resources/embeddings';
-import { ChatCompletion, ChatCompletionMessage } from 'openai/resources/index';
+import {
+  ChatCompletion,
+  ChatCompletionSystemMessageParam,
+  ChatCompletionUserMessageParam,
+} from 'openai/resources/index';
 
 @Injectable()
 export class OpenaiApiService {
@@ -12,7 +16,10 @@ export class OpenaiApiService {
   }
 
   async generateCompletion(
-    messages: ChatCompletionMessage[],
+    messages: (
+      | ChatCompletionSystemMessageParam
+      | ChatCompletionUserMessageParam
+    )[],
   ): Promise<ChatCompletion> {
     return await this.openaiApiRepository.generateCompletion(messages);
   }

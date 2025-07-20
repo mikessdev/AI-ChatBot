@@ -8,7 +8,8 @@ import {
 import {
   ChatCompletion,
   ChatCompletionCreateParams,
-  ChatCompletionMessage,
+  ChatCompletionSystemMessageParam,
+  ChatCompletionUserMessageParam,
 } from 'openai/resources/index';
 
 export class OpenaiApiRepository {
@@ -44,7 +45,10 @@ export class OpenaiApiRepository {
   }
 
   async generateCompletion(
-    messages: ChatCompletionMessage[],
+    messages: (
+      | ChatCompletionSystemMessageParam
+      | ChatCompletionUserMessageParam
+    )[],
   ): Promise<ChatCompletion> {
     try {
       const body: ChatCompletionCreateParams = {
