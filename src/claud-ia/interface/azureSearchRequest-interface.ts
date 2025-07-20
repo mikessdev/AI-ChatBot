@@ -2,7 +2,7 @@ export interface VectorQuery {
   vector: number[];
   k: number;
   fields: string;
-  kind: 'vector';
+  kind: string;
 }
 
 export interface AzureSearchRequest {

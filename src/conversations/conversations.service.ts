@@ -17,7 +17,7 @@ export class ConversationsService {
   async generateCompletion(completion: CompletionRequestDto) {
     const { projectName, messages } = completion;
     const generateEmbeddingsPromises: Promise<CreateEmbeddingResponse>[] = [];
-    const embeddingsAnswers: any[] = [];
+    const embeddingsAnswers: Promise<any>[] = [];
 
     messages.forEach(({ content }) => {
       generateEmbeddingsPromises.push(
@@ -29,19 +29,21 @@ export class ConversationsService {
 
     userEmbeddings.forEach(({ data }) => {
       embeddingsAnswers.push(
-        this.searchEmbeddingsByProjectName(projectName, data[0].embedding),
+        this.retrieveRelatedTexts(projectName, data[0].embedding),
       );
     });
 
     const answers: any[] = await Promise.all(embeddingsAnswers);
-
-    return 'Hello World';
+    return answers;
   }
 
-  private async searchEmbeddingsByProjectName(
+  private async retrieveRelatedTexts(
     projectName: string,
     embeddings: number[],
   ) {
-    return await this.claudIaService.searchEmbeddings(projectName, embeddings);
+    return await this.claudIaService.searchEmbeddingsByProjectName(
+      projectName,
+      embeddings,
+    );
   }
 }

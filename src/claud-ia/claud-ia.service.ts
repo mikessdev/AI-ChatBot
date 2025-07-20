@@ -7,17 +7,32 @@ import { AzureSearchResponse } from './interface/azureSearchResponse-interface';
 export class CloudIAService {
   constructor(private readonly repository: CloudIARepository) {}
 
-  async searchEmbeddings(
+  async searchEmbeddingsByProjectName(
     projectName: string,
     embeddings: number[],
   ): Promise<AzureSearchResponse> {
+    const queryEmbedding: AzureSearchRequest = this.buildEmbeddingQuery(
+      projectName,
+      embeddings,
+    );
+
+    return await this.repository.GetFromVectorApi(queryEmbedding);
+  }
+
+  private buildEmbeddingQuery(
+    projectName: string,
+    embeddings: number[],
+  ): AzureSearchRequest {
     const azureSearchRequest: AzureSearchRequest = {
-      filter: `projectName eq '\''${projectName}'\''`,
+      count: true,
+      select: 'content, type',
+      top: 10,
+      filter: `projectName eq '${projectName}'`,
       vectorQueries: [
-        { k: 10, fields: 'content', kind: 'vector', vector: embeddings },
+        { vector: embeddings, k: 3, fields: 'embeddings', kind: 'vector' },
       ],
     };
 
-    return await this.repository.searchEmbeddings(azureSearchRequest);
+    return azureSearchRequest;
   }
 }

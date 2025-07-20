@@ -4,52 +4,32 @@ import { AzureSearchResponse } from './interface/azureSearchResponse-interface';
 
 export class CloudIARepository {
   private readonly URL: string;
-  private readonly API_KEY: string;
+  private readonly HEADERS: Record<string, string>;
 
   constructor() {
     this.URL = process.env.BASE_ClAUDIA_URL || '';
-    this.API_KEY = process.env.AZURE_AI_SEARCH_KEY || '';
+    this.HEADERS = {
+      'Content-Type': 'application/json',
+      'api-key': process.env.CLAUD_API_KEY || '',
+    };
   }
 
-  async searchEmbeddings(
+  async GetFromVectorApi(
     azureSearchRequest: AzureSearchRequest,
   ): Promise<AzureSearchResponse> {
-    const {
-      count = true,
-      select = 'content, type',
-      top = 10,
-      filter,
-      vectorQueries,
-    } = azureSearchRequest;
-
     const url: string = `${this.URL}/search?api-version=2023-11-01`;
-    const body: AzureSearchRequest = {
-      count,
-      select,
-      top,
-      filter,
-      vectorQueries,
-    };
 
     try {
       const response = await fetch(url, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'api-key': this.API_KEY,
-        },
-        body: JSON.stringify(body),
+        headers: this.HEADERS,
+        body: JSON.stringify(azureSearchRequest),
       });
-
-      if (!response.ok) {
-        const error = await response.text();
-        throw new Error(`Azure Search failed: ${response.status} ${error}`);
-      }
 
       return await response.json();
     } catch (error) {
       throw new InternalServerErrorException(
-        `Azure Search failed: ${error.message}`,
+        `Claud vector api failed: ${error.message}`,
       );
     }
   }
