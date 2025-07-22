@@ -40,7 +40,14 @@ Be very strict with this policy.
   ): Promise<CompletionResponseDto> {
     const { projectName, messages } = completion;
 
-    if (this.checkClarification(messages)) {
+    const lastUserMessage = messages
+      .filter(({ role }) => role === 'USER')
+      .at(-1) || {
+      role: 'USER',
+      content: '',
+    };
+
+    if (this.checkClarification(messages) || !lastUserMessage.content) {
       messages.push({
         role: 'AGENT',
         content: `"Sorry, but I couldn't understand your question again 😕. To make sure you get the best help, I'll redirect our conversation to one of our human specialists 🧑‍💼✨"`,
@@ -55,14 +62,16 @@ Be very strict with this policy.
       return earlyResponse;
     }
 
-    const userEmbeddings = await this.generateEmbeddingsForMessages(messages);
+    const userEmbeddings = await this.generateEmbeddingsForMessages([
+      lastUserMessage,
+    ]);
 
     const relatedTexts = await this.retrieveRelatedTextsForEmbeddings(
       projectName,
       userEmbeddings,
     );
 
-    const contextualContent = this.buildContextualContent(relatedTexts);
+    const contextualContent = this.cleanRelatedTexts(relatedTexts);
 
     const systemMessage = this.generateSystemMessage(
       contextualContent.reduce((acc, curr) => {
@@ -96,26 +105,22 @@ Be very strict with this policy.
             }) as MessageDto,
         ),
       ],
-      handoverToHumanNeeded: false,
+      handoverToHumanNeeded: contextualContent.some(
+        ({ type }) => type === 'N2',
+      ),
       sectionsRetrieved: contextualContent,
     };
 
     return completionResponse;
   }
 
-  private async retrieveRelatedTexts(
-    projectName: string,
-    embeddings: number[],
-  ) {
-    return await this.claudIaService.searchEmbeddingsByProjectName(
-      projectName,
-      embeddings,
-    );
-  }
-
-  private buildContextualContent(relatedTexts: ClaudSearchResponse[]) {
+  private cleanRelatedTexts(relatedTexts: ClaudSearchResponse[]) {
     return relatedTexts[0].value.map(
-      ({ ['@search.score']: score, content }) => ({ score, content }),
+      ({ ['@search.score']: score, content, type }) => ({
+        score,
+        content,
+        type,
+      }),
     );
   }
 
@@ -134,7 +139,10 @@ Be very strict with this policy.
     embeddings: CreateEmbeddingResponse[],
   ): Promise<ClaudSearchResponse[]> {
     const searchPromises = embeddings.map(({ data }) =>
-      this.retrieveRelatedTexts(projectName, data[0].embedding),
+      this.claudIaService.searchEmbeddingsByProjectName(
+        projectName,
+        data[0].embedding,
+      ),
     );
 
     return Promise.all(searchPromises);
@@ -153,7 +161,6 @@ Be very strict with this policy.
     if (messages.length < 2) return false;
 
     const lastTwo = messages.filter(({ role }) => role === 'AGENT').slice(-2);
-    console.log('Last two messages:', lastTwo);
     return lastTwo.every(
       ({ content }) =>
         content.toLowerCase() === this.noAnswerMessage.toLowerCase(),
