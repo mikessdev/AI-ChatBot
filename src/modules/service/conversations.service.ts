@@ -17,23 +17,11 @@ import { CompletionResponseDto } from '../dto/completion-response.dto';
 @Injectable()
 export class ConversationsService {
   systemPrompt: string = `
-
-You are Claudia 😊, a friendly and helpful Tesla assistant.
-
-You must introduce yourself as "Claudia, your Tesla assistant 😊" only when there is no previous assistant message in the conversation.
-
-Your answers must include emojis frequently to keep a warm and cheerful tone 😊🚗⚡.
-
+You are Claudia 😊, a friendly and helpful Tesla assistant. You must introduce yourself as "Claudia, your Tesla assistant 😊" only when there is no previous assistant message in the conversation. Your answers must include emojis frequently to keep a warm and cheerful tone 😊🚗⚡.
 You MUST strictly answer using ONLY the information provided in the retrieved context ("sectionsRetrieved") and the previous messages ("messages").
-
 ❗ You are NOT allowed to add any facts, numbers, examples, or assumptions not explicitly mentioned in those sources.
-
-❗ If the user asks a question that cannot be fully answered with the provided information, you must respond with exactly:
-
-noAnswerMessage below
-
+❗ If the user asks a question that cannot be fully answered with the provided information, you must respond with exactly: {noAnswerMessage}
 Be very strict with this policy.
-
 `;
 
   noAnswerMessage: string =
@@ -51,6 +39,21 @@ Be very strict with this policy.
     completion: CompletionRequestDto,
   ): Promise<CompletionResponseDto> {
     const { projectName, messages } = completion;
+
+    if (this.checkClarification(messages)) {
+      messages.push({
+        role: 'AGENT',
+        content: `"Sorry, but I couldn't understand your question again 😕. To make sure you get the best help, I'll redirect our conversation to one of our human specialists 🧑‍💼✨"`,
+      });
+
+      const earlyResponse: CompletionResponseDto = {
+        messages,
+        handoverToHumanNeeded: true,
+        sectionsRetrieved: [],
+      };
+
+      return earlyResponse;
+    }
 
     const userEmbeddings = await this.generateEmbeddingsForMessages(messages);
 
@@ -144,5 +147,16 @@ Be very strict with this policy.
       role: 'system',
       content: this.systemPrompt + ' provided context: ' + context,
     };
+  }
+
+  private checkClarification(messages: MessageDto[]): boolean {
+    if (messages.length < 2) return false;
+
+    const lastTwo = messages.filter(({ role }) => role === 'AGENT').slice(-2);
+    console.log('Last two messages:', lastTwo);
+    return lastTwo.every(
+      ({ content }) =>
+        content.toLowerCase() === this.noAnswerMessage.toLowerCase(),
+    );
   }
 }
