@@ -1,7 +1,4 @@
-import {
-  InternalServerErrorException,
-  ServiceUnavailableException,
-} from '@nestjs/common';
+import { ServiceUnavailableException } from '@nestjs/common';
 import { ClaudSearchRequest } from '../interface/claudSearchRequest-interface';
 import { ClaudSearchResponse } from '../interface/claudSearchResponse-interface';
 

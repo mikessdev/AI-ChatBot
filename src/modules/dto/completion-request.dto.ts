@@ -7,7 +7,6 @@ import {
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
-import { ChatCompletionContentPart } from 'openai/resources/index';
 
 export class MessageDto {
   @ApiProperty({ example: 'USER', enum: ['USER', 'AGENT'] })

@@ -9,7 +9,6 @@ import { CloudIAService } from 'src/modules/service/claud-ia.service';
 import { ClaudSearchResponse } from 'src/modules/interface/claudSearchResponse-interface';
 import {
   ChatCompletion,
-  ChatCompletionRole,
   ChatCompletionSystemMessageParam,
   ChatCompletionUserMessageParam,
 } from 'openai/resources/index';
@@ -46,15 +45,23 @@ export class ConversationsService {
       | ChatCompletionUserMessageParam
     )[] = [systemMessage, userMessage];
 
-    const agentAnswer: ChatCompletion =
+    const agentCompletion: ChatCompletion =
       await this.openaiApiService.generateCompletion(completionMessages);
+
+    const isUncertain = contextualContent.length
+      ? contextualContent[0].score < 0.51
+      : true;
+
+    const agentAnswer = isUncertain
+      ? 'Desculpe, não consegui entender completamente sua pergunta. Poderia, por gentileza, fornecer mais detalhes ou reformular para que eu possa te ajudar melhor? 😊'
+      : agentCompletion.choices[0].message.content;
 
     const completionResponse: CompletionResponseDto = {
       messages: [
         this.generateCustomMessage('USER', userContent),
         this.generateCustomMessage(
           'AGENT',
-          agentAnswer.choices[0].message.content || 'No response from agent',
+          agentAnswer || 'No response from agent',
         ),
       ],
       handoverToHumanNeeded: false,
@@ -76,7 +83,7 @@ export class ConversationsService {
 
   private buildContextualContent(relatedTexts: ClaudSearchResponse[]) {
     return relatedTexts[0].value.map(
-      ({ ['@search.score']: score, content, type }) => ({ score, content }),
+      ({ ['@search.score']: score, content }) => ({ score, content }),
     );
   }
 
@@ -114,8 +121,7 @@ export class ConversationsService {
   private generateSystemMessage(): ChatCompletionSystemMessageParam {
     return {
       role: 'system',
-      content:
-        "You are a helpful and friendly assistant. Always start your reply with 'Hello'. Your response must be based on the provided context — do not make assumptions. Keep your answer short, easy to understand, and pleasant in tone.",
+      content: `You are a AI assistante named Claudia, you should be polite and you like to use emoticons when asnwer questions, and you will answer the users questions based on the context provided. you need first apresent youself as a AI assistant for the user and then answer the question, the answers need to be short and you dont need to guess adictional informations about the questions, if you realized that the context provided is not enough to answer the question, you should ask for more information and if you realize that the context provided is not related to the user question, you will invited the user for make more questions`,
     };
   }
 
