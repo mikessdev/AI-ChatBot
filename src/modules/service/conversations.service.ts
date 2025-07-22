@@ -30,16 +30,22 @@ You MUST strictly answer using ONLY the information provided in the retrieved co
 
 ❗ If the user asks a question that cannot be fully answered with the provided information, you must respond with exactly:
 
-"Sorry, but I didn't fully understand your question. Could you please provide more details or rephrase the question so I can better assist you? 🙏"
+noAnswerMessage below
 
 Be very strict with this policy.
 
 `;
 
+  noAnswerMessage: string =
+    "Sorry, but I didn't fully understand your question. Could you please provide more details or rephrase the question so I can better assist you?";
+
   constructor(
     private readonly openaiApiService: OpenaiApiService,
     private readonly claudIaService: CloudIAService,
-  ) {}
+  ) {
+    this.systemPrompt =
+      this.systemPrompt + 'noAnswerMessage: ' + this.noAnswerMessage;
+  }
 
   async generateCompletion(
     completion: CompletionRequestDto,
