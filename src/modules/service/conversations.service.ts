@@ -16,6 +16,26 @@ import { CompletionResponseDto } from '../dto/completion-response.dto';
 
 @Injectable()
 export class ConversationsService {
+  systemPrompt: string = `
+
+You are Claudia 😊, a friendly and helpful Tesla assistant.
+
+You must introduce yourself as "Claudia, your Tesla assistant 😊" only when there is no previous assistant message in the conversation.
+
+Your answers must include emojis frequently to keep a warm and cheerful tone 😊🚗⚡.
+
+You MUST strictly answer using ONLY the information provided in the retrieved context ("sectionsRetrieved") and the previous messages ("messages").
+
+❗ You are NOT allowed to add any facts, numbers, examples, or assumptions not explicitly mentioned in those sources.
+
+❗ If the user asks a question that cannot be fully answered with the provided information, you must respond with exactly:
+
+"Sorry, but I didn't fully understand your question. Could you please provide more details or rephrase the question so I can better assist you? 🙏"
+
+Be very strict with this policy.
+
+`;
+
   constructor(
     private readonly openaiApiService: OpenaiApiService,
     private readonly claudIaService: CloudIAService,
@@ -26,9 +46,6 @@ export class ConversationsService {
   ): Promise<CompletionResponseDto> {
     const { projectName, messages } = completion;
 
-    //QUESTION: should accept more than one message?
-    const userContent = messages[0].content;
-
     const userEmbeddings = await this.generateEmbeddingsForMessages(messages);
 
     const relatedTexts = await this.retrieveRelatedTextsForEmbeddings(
@@ -37,31 +54,37 @@ export class ConversationsService {
     );
 
     const contextualContent = this.buildContextualContent(relatedTexts);
-    const systemMessage = this.generateSystemMessage();
-    const userMessage = this.generateUserMessage(userContent);
+
+    const systemMessage = this.generateSystemMessage(
+      contextualContent.reduce((acc, curr) => {
+        return acc + curr.content + ' ';
+      }, ''),
+    );
+
+    const userMessage: ChatCompletionUserMessageParam[] = messages.map(
+      ({ content }) => ({
+        role: 'user',
+        content,
+      }),
+    );
 
     const completionMessages: (
       | ChatCompletionSystemMessageParam
       | ChatCompletionUserMessageParam
-    )[] = [systemMessage, userMessage];
+    )[] = [systemMessage, ...userMessage];
 
     const agentCompletion: ChatCompletion =
       await this.openaiApiService.generateCompletion(completionMessages);
 
-    const isUncertain = contextualContent.length
-      ? contextualContent[0].score < 0.51
-      : true;
-
-    const agentAnswer = isUncertain
-      ? 'Desculpe, não consegui entender completamente sua pergunta. Poderia, por gentileza, fornecer mais detalhes ou reformular para que eu possa te ajudar melhor? 😊'
-      : agentCompletion.choices[0].message.content;
-
     const completionResponse: CompletionResponseDto = {
       messages: [
-        this.generateCustomMessage('USER', userContent),
-        this.generateCustomMessage(
-          'AGENT',
-          agentAnswer || 'No response from agent',
+        ...messages,
+        ...agentCompletion.choices.map(
+          ({ message }) =>
+            ({
+              role: 'AGENT',
+              content: message.content,
+            }) as MessageDto,
         ),
       ],
       handoverToHumanNeeded: false,
@@ -108,29 +131,12 @@ export class ConversationsService {
     return Promise.all(searchPromises);
   }
 
-  private generateCustomMessage(
-    role: MessageDto['role'],
-    content: MessageDto['content'],
-  ): MessageDto {
-    return {
-      role,
-      content,
-    };
-  }
-
-  private generateSystemMessage(): ChatCompletionSystemMessageParam {
+  private generateSystemMessage(
+    context: string,
+  ): ChatCompletionSystemMessageParam {
     return {
       role: 'system',
-      content: `You are a AI assistante named Claudia, you should be polite and you like to use emoticons when asnwer questions, and you will answer the users questions based on the context provided. you need first apresent youself as a AI assistant for the user and then answer the question, the answers need to be short and you dont need to guess adictional informations about the questions, if you realized that the context provided is not enough to answer the question, you should ask for more information and if you realize that the context provided is not related to the user question, you will invited the user for make more questions`,
-    };
-  }
-
-  private generateUserMessage(
-    userContent: string,
-  ): ChatCompletionUserMessageParam {
-    return {
-      role: 'user',
-      content: userContent,
+      content: this.systemPrompt + ' provided context: ' + context,
     };
   }
 }
