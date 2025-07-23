@@ -47,21 +47,6 @@ export class ConversationsService {
       content: '',
     };
 
-    if (this.checkClarification(messages) || !lastUserMessage.content) {
-      messages.push({
-        role: 'AGENT',
-        content: this.answerRedirectForHuman,
-      });
-
-      const earlyResponse: CompletionResponseDto = {
-        messages,
-        handoverToHumanNeeded: true,
-        sectionsRetrieved: [],
-      };
-
-      return earlyResponse;
-    }
-
     const userEmbeddings = await this.generateEmbeddingsForMessages([
       lastUserMessage,
     ]);
@@ -93,6 +78,24 @@ export class ConversationsService {
 
     const agentCompletion: ChatCompletion =
       await this.openaiApiService.generateCompletion(completionMessages);
+
+    if (this.checkClarification(messages) || !lastUserMessage.content) {
+      messages.push({
+        role: 'AGENT',
+        content: this.answerRedirectForHuman,
+      });
+
+      const earlyResponse: CompletionResponseDto = {
+        messages,
+        handoverToHumanNeeded: true,
+        sectionsRetrieved: contextualContent.map(({ content, score }) => ({
+          score,
+          content,
+        })),
+      };
+
+      return earlyResponse;
+    }
 
     const completionResponse: CompletionResponseDto = {
       messages: [
