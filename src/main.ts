@@ -24,7 +24,7 @@ async function bootstrap() {
   });
 
   app.useGlobalPipes(new ValidationPipe());
-
+  console.log('🚀 Application is running on port ', process.env.PORT ?? 3004);
   await app.listen(process.env.PORT ?? 3004);
 }
 
