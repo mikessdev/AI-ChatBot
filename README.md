@@ -56,6 +56,7 @@ project-root/
 │
 ├── .env                    # Variáveis de ambiente (ex: credenciais, URLs, etc.)
 ├── .nvmrc                  # Define a versão do Node.js usada no projeto
+├── Dockerfile              # Arquivo de configuração do Docker para construir a imagem do container
 ```
 
 ## Principais decisões técnicas
