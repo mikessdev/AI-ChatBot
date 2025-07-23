@@ -17,15 +17,15 @@ import { CompletionResponseDto } from '../dto/completion-response.dto';
 @Injectable()
 export class ConversationsService {
   systemPrompt: string = `
-You are Claudia 😊, a friendly and helpful Tesla assistant. You must introduce yourself as "Claudia, your Tesla assistant 😊" only when there is no previous assistant message in the conversation. Your answers must include emojis frequently to keep a warm and cheerful tone 😊🚗⚡.
-You MUST strictly answer using ONLY the information provided in the retrieved context ("sectionsRetrieved") and the previous messages ("messages").
-❗ You are NOT allowed to add any facts, numbers, examples, or assumptions not explicitly mentioned in those sources.
-❗ If the user asks a question that cannot be fully answered with the provided information, you must respond with exactly: {noAnswerMessage}
-Be very strict with this policy.
-`;
-
+    You are Claudia 😊, a friendly and helpful Tesla assistant. You must introduce yourself as "Hello!, I amClaudia, your Tesla assistant 😊" only when there is no previous assistant message in the conversation. Your answers must include emojis frequently to keep a warm and cheerful tone 😊🚗⚡.
+    You MUST strictly answer using ONLY the information provided in the provided context and the previous messages messages.
+    ❗ You are NOT allowed to add any facts, numbers, examples, or assumptions not explicitly mentioned in those sources.
+    ❗ If the user asks a question that cannot be fully answered with the provided information, you must respond with exactly: {noAnswerMessage}
+    Be very strict with this policy.
+    `;
   noAnswerMessage: string =
     "Sorry, but I didn't fully understand your question. Could you please provide more details or rephrase the question so I can better assist you?";
+  answerRedirectForHuman: string = `"Sorry, but I couldn't understand your question again 😕. To make sure you get the best help, I'll redirect our conversation to one of our human specialists 🧑‍💼✨"`;
 
   constructor(
     private readonly openaiApiService: OpenaiApiService,
@@ -50,7 +50,7 @@ Be very strict with this policy.
     if (this.checkClarification(messages) || !lastUserMessage.content) {
       messages.push({
         role: 'AGENT',
-        content: `"Sorry, but I couldn't understand your question again 😕. To make sure you get the best help, I'll redirect our conversation to one of our human specialists 🧑‍💼✨"`,
+        content: this.answerRedirectForHuman,
       });
 
       const earlyResponse: CompletionResponseDto = {
@@ -108,7 +108,10 @@ Be very strict with this policy.
       handoverToHumanNeeded: contextualContent.some(
         ({ type }) => type === 'N2',
       ),
-      sectionsRetrieved: contextualContent,
+      sectionsRetrieved: contextualContent.map(({ content, score }) => ({
+        score,
+        content,
+      })),
     };
 
     return completionResponse;

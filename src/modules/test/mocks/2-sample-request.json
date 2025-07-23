@@ -1,0 +1,22 @@
+{
+  "helpdeskId": 123456,
+  "projectName": "tesla_motors",
+  "messages": [
+    {
+      "role": "USER",
+      "content": "How do I charge my Tesla at home?"
+    },
+    {
+      "role": "AGENT",
+      "content": "Claudia, your Tesla assistant 😊\n\nYou can charge your Tesla at home by installing a home charger, which allows you to conveniently charge your vehicle overnight. ⚡🏠🚗 It's a great way to ensure your car is ready to go each morning! 😊💡"
+    },
+    {
+      "role": "USER",
+      "content": "what is my name?"
+    },
+    {
+      "role": "AGENT",
+      "content": "Sorry, but I didn't fully understand your question. Could you please provide more details or rephrase the question so I can better assist you?"
+    }
+  ]
+}

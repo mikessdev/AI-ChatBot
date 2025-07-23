@@ -1,0 +1,21 @@
+{
+  "@odata.context": "https://claudia-db.search.windows.net/indexes('claudia-ids-index-large')/$metadata#docs(*)",
+  "@odata.count": 3,
+  "value": [
+    {
+      "@search.score": 0.5891415,
+      "content": "How do I know if my Tesla battery needs replacement? Tesla batteries are designed to last many years; the vehicle will notify you if maintenance is needed.",
+      "type": "N1"
+    },
+    {
+      "@search.score": 0.5652719,
+      "content": "What is Tesla's battery warranty? Tesla’s battery warranty typically lasts for 8 years or about 150,000 miles, depending on the model.",
+      "type": "N1"
+    },
+    {
+      "@search.score": 0.47880659,
+      "content": "What happens if the Tesla battery completely drains? The car will need to be towed to a charging station.",
+      "type": "N1"
+    }
+  ]
+}

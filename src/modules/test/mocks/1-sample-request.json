@@ -1,0 +1,10 @@
+{
+  "helpdeskId": 123456,
+  "projectName": "tesla_motors",
+  "messages": [
+    {
+      "role": "USER",
+      "content": "Hello! How long does a Tesla battery last before it needs to be replaced?"
+    }
+  ]
+}
