@@ -11,7 +11,7 @@ O projeto consiste em uma API que utiliza o OpenAI ChatGPT para responder a perg
 Como rodar o projeto sem docker
 
 ```bash
-    cp sample_.env .env   #preencha as variáveis de ambiente
+    cp .env_sample .env   #preencha as variáveis de ambiente
     npm install
     npm run dev
 ```
